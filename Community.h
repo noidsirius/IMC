@@ -3,14 +3,22 @@
 
 //class core;
 #include "common.h"
-#include "anyoption.h"
 
 class Community {
 
-  Community* parent;
-  
-
 public:
+
+  Community* parent;
+  int depth;
+  vector<Community*> children;
+  UID id;
+
+
+  Community(UID id, int depth);
+  void setParent(Community* parent);
+  void addChild(Community* child);
+  int diffDepth(Community* community);
+
 
 private:
 

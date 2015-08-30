@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "HashTreeMap.cc"
+#include "Community.h"
 #include <vector>
 #include <cmath>
 #include <ctime>
@@ -26,6 +27,7 @@ struct MGStruct {
 	int flag; // size of the seed set in current run
 };
 
+
 // to make a list sorted by MGs (or coverage)
 typedef multimap<float, MGStruct*> Gains;
 
@@ -46,9 +48,15 @@ class MC {
     unsigned int numEdges;
 
 	HashTreeCube *AM;
-    //HashTreeCube* AM_in;
-    HashTreeCube2 *revAM;
-    FriendsMap seedSetNeighbors;
+
+	// Related to Community
+	HashTreeCube **communities_AM;
+	HashTreeMap<int, vector<Community*>* > *communities_by_depth;
+	HashTreeMap<UID, Community* > *all_communities;
+	UID last_community_id;
+	UID max_node_id;
+
+	FriendsMap seedSetNeighbors;
 	Gains mgs;
 
 	string outdir;
@@ -84,7 +92,6 @@ public:
 	void setAM(HashTreeCube* AM1) {AM = AM1;}
     HashTreeCube *getAM() {return this->AM;}
     //HashTreeCube *getAMIn() {return this->AM_in;}
-    HashTreeCube2 *getRevAM() {return this->revAM;}
     UserList *getUsers() {return &this->users;}
     unsigned int getNumEdges() {return this->numEdges;}
 
@@ -102,8 +109,8 @@ private:
 	/****** For CELF++ on Monte Carlo Simulation!  *****/
 	float mineSeedSetPlus();
 	bool ICCovPlus(MGStruct *pMG, MGStruct *pBestMG); // IC model + CELF++
-	bool MC::ICCovPlus_Community(MGStruct* pMG, MGStruct* pBestMG);
-    bool LTCovPlus(MGStruct *pMG, MGStruct *pBestMG, UserList &); // LT model + CELF++
+	bool ICCovPlus_Community(MGStruct* pMG, MGStruct* pBestMG);
+  bool LTCovPlus(MGStruct *pMG, MGStruct *pBestMG, UserList &); // LT model + CELF++
 
 	// other private functions
 	float getTime() const;
@@ -114,6 +121,10 @@ private:
 
 	void printVector(vector<UID>& vec, float pp);
 
+
+	//Related to Community
+	void createCommunity(UID id, int depth);
+	void makeCommunities();
 
 
 };

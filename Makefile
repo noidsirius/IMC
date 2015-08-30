@@ -1,22 +1,29 @@
 CC=g++
-CFLAGS=-c -O3 
+CFLAGS=-c -O3
 DEBFLAGS=-c -g
 LEADERSPATH=../leaders-3.0
 OFLAGS=-DPARSEINPUT_H=1
 
 all: InfluenceModels
 
-InfluenceModels: common.o anyoption.o MC.o InfluenceModels.o 
-	$(CC) -O3 common.o anyoption.o MC.o InfluenceModels.o -o InfluenceModels
+InfluenceModels: common.o anyoption.o MC.o InfluenceModels.o Community.o
+	$(CC) -O3 common.o anyoption.o MC.o InfluenceModels.o Community.o -o InfluenceModels
 
 common.o: common.cc
-	$(CC) $(CFLAGS) common.cc	
+	$(CC) $(CFLAGS) common.cc
 
 anyoption.o: anyoption.cc
-	$(CC) $(CFLAGS) anyoption.cc 
+	$(CC) $(CFLAGS) anyoption.cc
 
 MC.o: MC.cc
 	$(CC) $(CFLAGS) MC.cc
+
+Community.o: Community.cc
+	$(CC) $(CFLAGS) Community.cc
+
+GraphHandler.o: GraphHandler.cc
+	$(CC) $(CFLAGS) GraphHandler.cc
+
 
 InfluenceModels.o: InfluenceModels.cc
 	$(CC) $(CFLAGS) InfluenceModels.cc
@@ -28,7 +35,7 @@ common_debug.o: common.cc
 	$(CC) $(DEBFLAGS) common.cc
 
 anyoption_debug.o: anyoption.cc
-	$(CC) $(DEBFLAGS) anyoption.cc 
+	$(CC) $(DEBFLAGS) anyoption.cc
 
 MC_debug.o: MC.cc
 	$(CC) $(DEBFLAGS) MC.cc
@@ -38,4 +45,3 @@ InfluenceModels_debug.o: InfluenceModels.cc
 
 clean:
 	rm -f *.o *~
-

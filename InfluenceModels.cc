@@ -6,15 +6,15 @@ InfluenceModels::InfluenceModels() {
 InfluenceModels::~InfluenceModels() {
 	string pid = intToStr(unsigned(getpid()));
 	string outfile = "temp/tmp_" + pid + ".txt";
-	
+
 	string command = string("rm -f ") + outfile ;
 	system(command.c_str());
-	
+
 	//delete input;
 }
 
-void InfluenceModels::doAll(int argc, char* argv[]) 
-{ 
+void InfluenceModels::doAll(int argc, char* argv[])
+{
 	// Lets harcode oneAction option for now
 	actionsProcessTillNow = 0;
 
@@ -33,15 +33,15 @@ void InfluenceModels::doAll(int argc, char* argv[])
 
 	command = string("mkdir -p temp") ;
 	system(command.c_str());
-	
+
 //	mkdir(outdir, 0777);
 
-	if (phase == 10 || phase == 11) {
+	if (phase == 10 || phase == 11 || phase == 12) {
 		MC* mc = new MC(opt);
 		mc->doAll();
 		delete mc;
-	} 
-	
+	}
+
 
 	delete opt;
 
@@ -52,13 +52,13 @@ void InfluenceModels::doAll(int argc, char* argv[])
 }
 
 
-AnyOption* InfluenceModels::readOptions(int argc, char* argv[] ) 
+AnyOption* InfluenceModels::readOptions(int argc, char* argv[] )
 {
 	// read the command line options
 	AnyOption *opt = new AnyOption();
 
 	// ignore POSIX style options
-	opt->noPOSIX(); 
+	opt->noPOSIX();
 	opt->setVerbose(); /* print warnings about unknown options */
 	opt->autoUsagePrint(true); /* print usage for bad options */
 
@@ -94,7 +94,7 @@ AnyOption* InfluenceModels::readOptions(int argc, char* argv[] )
 	/* for options that will be checked only from the option/resource file */
 	opt->setOption("phase");
 	opt->setOption("probGraphFile");
-	
+
 	// for static or dynamic friendship graph setting
 
 	// option for dataset size
@@ -140,10 +140,10 @@ AnyOption* InfluenceModels::readOptions(int argc, char* argv[] )
 	return opt;
 
 }
-	
 
 
-int main(int argc, char* argv[]) {	
+
+int main(int argc, char* argv[]) {
 	InfluenceModels *L = new InfluenceModels();
 	L->doAll(argc, argv);
 	//L->writeSummary(0);
@@ -151,5 +151,3 @@ int main(int argc, char* argv[]) {
 	delete L;
 	return 0;
 }
-
-

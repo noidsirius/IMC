@@ -10,6 +10,8 @@
 #include <stack>
 #include <sys/resource.h>
 #include <map>
+#include <vector>
+#include <assert.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sstream>
