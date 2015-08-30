@@ -20,14 +20,14 @@ struct MGStruct {
 	UID nodeID; // user ID
 	float gain; // MG(u|S)
 	UID v_best; // user that gives best MG till now
-	
+
 	// marginal gain of user u w.r.t the curSeedSet + u_best. i.e., MG(u|S+v_best)
 	float gain_next;
 	int flag; // size of the seed set in current run
 };
 
 // to make a list sorted by MGs (or coverage)
-typedef multimap<float, MGStruct*> Gains; 
+typedef multimap<float, MGStruct*> Gains;
 
 struct NodeParams {
 	float threshold;
@@ -38,14 +38,14 @@ struct NodeParams {
 class MC {
 
 	AnyOption* opt;
-	
-	UserList curSeedSet; 
+
+	UserList curSeedSet;
 	UserList users;
-	UserList covBestNode;	 // newly made for binary prob. case 
+	UserList covBestNode;	 // newly made for binary prob. case
 	//UserList covSeedSet;
     unsigned int numEdges;
 
-	HashTreeCube *AM; 
+	HashTreeCube *AM;
     //HashTreeCube* AM_in;
     HashTreeCube2 *revAM;
     FriendsMap seedSetNeighbors;
@@ -54,7 +54,7 @@ class MC {
 	string outdir;
 	const char* probGraphFile;
 	string m;
-	PropModels model; 
+	PropModels model;
 	GraphType graphType;
 
 	string problem;
@@ -64,7 +64,7 @@ class MC {
 
 
 	int countIterations;
-	float totalCov; 
+	float totalCov;
 
 	// parameters to monitor the progress of experiments
 	time_t startTime;
@@ -79,7 +79,7 @@ public:
 	float LTCov(UserList& list);
 	float computeLTCov(UserList& list);
 	float ICCov(UserList& list);
-	
+
 
 	void setAM(HashTreeCube* AM1) {AM = AM1;}
     HashTreeCube *getAM() {return this->AM;}
@@ -102,13 +102,14 @@ private:
 	/****** For CELF++ on Monte Carlo Simulation!  *****/
 	float mineSeedSetPlus();
 	bool ICCovPlus(MGStruct *pMG, MGStruct *pBestMG); // IC model + CELF++
-    bool LTCovPlus(MGStruct *pMG, MGStruct *pBestMG, UserList &); // LT model + CELF++	
+	bool MC::ICCovPlus_Community(MGStruct* pMG, MGStruct* pBestMG);
+    bool LTCovPlus(MGStruct *pMG, MGStruct *pBestMG, UserList &); // LT model + CELF++
 
 	// other private functions
 	float getTime() const;
 	float getTime_cur() const;
 	void writeInFile(UID v, float cov, float marginal_gain, int curTimeStep, float actualCov, float actualMG, int countUsers);
-	
+
 	void openOutputFiles();
 
 	void printVector(vector<UID>& vec, float pp);

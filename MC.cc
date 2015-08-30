@@ -663,6 +663,132 @@ bool MC::ICCovPlus(MGStruct* pMG, MGStruct* pBestMG) {
 	return ret;
 }
 
+bool MC::ICCovPlus_Community(MGStruct* pMG, MGStruct* pBestMG) {
+
+	startIt = strToInt(opt->getValue("startIt"));
+	//cout << "startIt : " << startIt << endl;
+
+	if(pMG == NULL) {
+		cout << "Some problem 3" << endl;
+	}
+
+	bool ret = false; // indicates if the current node is better than the previous best
+
+	float cov = 0; // compute cov(S + currentNode)
+	float covX = 0; // compute cov(S + currentNode + prevBestNode)
+
+	int seedSetSize = (int) curSeedSet.size();
+
+	// for each MC run:
+	for (int b = 0; b < countIterations; b++) {
+		queue<UID> Q;
+		UserList activeNodes;
+
+		// initialize Q and activeNodes using the Seed Set
+		for(UserList::iterator i = curSeedSet.begin(); i != curSeedSet.end(); i++) {
+			UID v = *i;
+			Q.push(v);
+			activeNodes.insert(v);
+		}
+		Q.push(pMG->nodeID); // also put the node being examined into queue
+		activeNodes.insert(pMG->nodeID);
+
+		while (Q.empty() == false) {
+			UID v = Q.front();
+
+			FriendsMap* neighbors = AM->find(v);
+			if (neighbors != NULL) {
+				for (FriendsMap::iterator j = neighbors->begin(); j != neighbors->end(); ++j) {
+					UID u = j->first;
+
+					if (activeNodes.find(u) == activeNodes.end()) {
+						float toss = ((float)(rand() % 1001))/(float)1000;
+						float p = j->second;
+
+						if (p >= toss) {
+							activeNodes.insert(u);
+							Q.push(u);
+						}
+					}
+				}
+			}
+
+			Q.pop();
+		}
+
+		cov += (float)activeNodes.size()/countIterations;
+
+		// if x has not been activated, and this iteration allows computing 4th column
+		if(pBestMG != NULL && seedSetSize >= (startIt - 1)  && activeNodes.find(pBestMG->nodeID) == activeNodes.end()) {
+
+			Q.push(pBestMG->nodeID); // Q starts with x only
+			activeNodes.insert(pBestMG->nodeID);
+
+			while (Q.empty() == false) {
+				UID v = Q.front();
+
+				FriendsMap* neighbors = AM->find(v);
+				if (neighbors != NULL) {
+
+					// for each inactive neighbour of v
+					for (FriendsMap::iterator j = neighbors->begin(); j != neighbors->end(); ++j) {
+						UID u = j->first;
+
+						if (activeNodes.find(u) == activeNodes.end()) {
+							float toss = ((float)(rand() % 1001))/(float)1000;
+							float p = j->second;
+
+							if (p >= toss) {
+								activeNodes.insert(u);
+								Q.push(u);
+							}
+						}
+					}
+				}
+
+				Q.pop();
+			}
+
+		}
+
+		covX += (float)activeNodes.size()/countIterations;
+
+	} //endfor -- each MC run
+
+	// After entire MC process
+//	cov = cov / countIterations;
+//	covX = covX / countIterations;
+
+	pMG->gain = cov - totalCov; // set "2nd column", MG(u|S)...
+
+	if (pBestMG == NULL) {
+		// for first run of each iteration, Best Node is not specified
+		pMG->v_best = pMG->nodeID;
+		pMG->gain_next = 0;
+
+		if (seedSetSize >= (startIt - 1)) {
+			return true;
+		} else {
+			return false;  // when it's not allowed to compute 4th column
+		}
+
+	} else { // if Best Node has been specified
+
+		if (pMG->gain > pBestMG->gain) {
+			// this node is better than the previous best
+			pMG->v_best = pMG->nodeID; // set "3rd column" to be itself
+			pMG->gain_next = 0; // set "4th column" to be zero
+			ret = true;
+		} else {
+			// this node is NO better than the previous best
+			pMG->v_best = pBestMG->nodeID;
+			pMG->gain_next = covX - totalCov - pBestMG->gain; // MG(u|S+x)
+			ret = false;
+		}
+	}
+
+	return ret;
+}
 
 
 
